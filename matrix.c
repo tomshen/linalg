@@ -66,6 +66,8 @@ Matrix matrix_copy(Matrix M)
 void matrix_free(Matrix M)
 {
     assert(is_matrix(M));
+    for(int i = 0; i < M->r; i++)
+        free(M->A[i]);
     free(M->A);
     free(M);
 }
