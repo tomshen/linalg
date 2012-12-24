@@ -6,7 +6,7 @@ Basic linear algebra library written in C
 Planned features
 ----------------
 * ~~Matrices (as 2-dimensional arrays)~~
-* ~~Vectors (as n by 1 matrices)~~
+* ~~Vectors (as *n* by 1 or 1 by *n* matrices)~~
     * ~~Normalize~~
     * ~~Dot (inner) product~~
 * ~~Basic operations~~
@@ -20,15 +20,15 @@ Planned features
     * ~~Transpose~~
     * Gaussian elimination (LU decomposition)
     * Inversion (Gauss-Jordan)
-    * Determinant (Use gaussian elimination, take product of diagonal entries)
-    * QR decomposition (and Least squares regression)
+    * Determinant (gaussian elimination, take product of diagonal entries)
+    * QR decomposition (and least squares regression)
 * Eigen-stuff
     * Eigenvalues
     * Eigenvectors
-    * Eigen Decomposition (if possible)
+    * Eigen decomposition
 * Input
     * Processing matrices from the command line
     * Processing matrices from a file
 * Output
-    * ~~Outputting to STDOUT~~
+    * ~~Outputting to stdout~~
     * Outputting to a file
