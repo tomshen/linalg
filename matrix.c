@@ -6,6 +6,14 @@
 #include <assert.h>
 #include "matrix.h"
 
+double* array_copy(double* A, int n)
+{
+    double* B = calloc(n, sizeof(double));
+    for(int i = 0; i < n; i++)
+        B[i] = A[i];
+    return B;
+}
+
 bool is_matrix(Matrix M)
 {
     if(M == NULL)
@@ -85,6 +93,21 @@ bool is_vector(Matrix V)
 {
     assert(is_matrix(V));
     return V->r == 1 || V->c == 1;
+}
+bool is_normal_vector(Matrix V)
+{
+    if(!is_vector(V))
+        return false;
+    int sum = 0;
+    if(V->r == 1) {
+        for(int i = 0; i < V->c; i++)
+            sum += V->A[0][i] * V->A[0][i];
+    }
+    else {
+        for(int i = 0; i < V->r; i++)
+            sum += V->A[i][0] * V->A[i][0];
+    }
+    return sum == 1;
 }
 Matrix vector_normalize(Matrix V)
 {
@@ -192,6 +215,47 @@ Matrix matrix_multiply_scalar(Matrix M, double n)
     assert(is_matrix(N));
     return N;
 }
+
+bool matrix_is_symmetric(Matrix M)
+{
+    if(!is_square_matrix(M))
+        return false;
+    int n = M->r;
+    for(int i = 0; i < n; i++)
+        for(int j = i; j < n; j++)
+            if(M->A[i][j] != M->A[j][i])
+                return false;
+    return true;
+}
+bool matrix_is_orthogonal(Matrix M)
+{
+    if(!is_square_matrix(M))
+        return false;
+    int n = M->c;
+    for(int i = 0; i < n; i++) {
+        double** A1 = calloc(1, sizeof(double*));
+        A1[0] = array_copy(M->A[i], n);
+        Matrix V1 = matrix_new(A1, 1, n);
+        if(!is_normal_vector(V1)) {
+            matrix_free(V1);
+            return false;
+        }
+        for(int j = 0; j < n; i++) {
+            double** A2 = calloc(1, sizeof(double*));
+            A2[0] = array_copy(M->A[i], n);
+            Matrix V2 = matrix_new(A2, 1, n);
+            if(!is_normal_vector(V2) || vector_dot_product(V1, V2) != 1) {
+                matrix_free(V1);
+                matrix_free(V2);
+                return false;
+            }
+            matrix_free(V2);
+        }
+        matrix_free(V1);
+    }
+    return true;
+}
+
 Matrix matrix_transpose(Matrix M)
 {
     assert(is_matrix(M));
@@ -204,12 +268,14 @@ Matrix matrix_transpose(Matrix M)
     assert(is_matrix(N));
     return N;
 }
+Matrix matrix_lu_decompose(Matrix M);
 Matrix matrix_inverse(Matrix M)
 {
-    assert(is_square_matrix(M));
+    if(!is_square_matrix(M))
+        return NULL;
     int n = M->r;
     Matrix N = matrix_new_empty(n, n);
     // TODO: fill in actual code here
-    assert(matrix_multiply(M, N));
     return N;
 }
+double matrix_determinant(Matrix M);

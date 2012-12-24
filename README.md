@@ -9,13 +9,13 @@ Planned features
 * ~~Vectors (as n by 1 matrices)~~
     * ~~Normalize~~
     * ~~Dot (inner) product~~
-* Basic operations
+* ~~Basic operations~~
     * ~~Addition~~
     * ~~Subtraction~~
     * ~~Multiplication~~
-* Basic classification
-    * Symmetric
-    * Orthogonal
+* ~~Basic classification~~
+    * ~~Symmetric~~ (needs testing)
+    * ~~Orthogonal~~ (needs testing)
 * Useful operations
     * ~~Transpose~~
     * Gaussian elimination (LU decomposition)
