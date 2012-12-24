@@ -14,18 +14,14 @@ Planned features
     * ~~Subtraction~~
     * ~~Multiplication~~
 * ~~Basic classification~~
-    * ~~Symmetric~~ (needs testing)
+    * ~~Symmetric~~
     * ~~Orthogonal~~ (needs testing)
 * Useful operations
     * ~~Transpose~~
-    * Gaussian elimination (LU decomposition)
+    * ~~Gaussian elimination~~
     * Inversion (Gauss-Jordan)
     * Determinant (gaussian elimination, take product of diagonal entries)
     * QR decomposition (and least squares regression)
-* Eigen-stuff
-    * Eigenvalues
-    * Eigenvectors
-    * Eigen decomposition
 * Input
     * Processing matrices from the command line
     * Processing matrices from a file

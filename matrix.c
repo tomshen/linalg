@@ -89,56 +89,29 @@ void matrix_print(Matrix M)
     }
 }
 
-bool is_vector(Matrix V)
+bool is_normal_vector(double* v, int n)
 {
-    assert(is_matrix(V));
-    return V->r == 1 || V->c == 1;
-}
-bool is_normal_vector(Matrix V)
-{
-    if(!is_vector(V))
-        return false;
     int sum = 0;
-    if(V->r == 1) {
-        for(int i = 0; i < V->c; i++)
-            sum += V->A[0][i] * V->A[0][i];
-    }
-    else {
-        for(int i = 0; i < V->r; i++)
-            sum += V->A[i][0] * V->A[i][0];
-    }
+    for(int i = 0; i < n; i++)
+        sum += v[i] * v[i];
     return sum == 1;
 }
-Matrix vector_normalize(Matrix V)
+double* vector_normalize(double* v, int n)
 {
-    assert(is_vector(V));
+    double* vn = calloc(n, sizeof(double));
     double sum = 0;
-    if(V->r == 1) {
-        for(int i = 0; i < V->c; i++)
-            sum += V->A[0][i] * V->A[0][i];
-    }
-    else {
-        for(int i = 0; i < V->r; i++)
-            sum += V->A[i][0] * V->A[i][0];
-    }
-    Matrix N = matrix_multiply_scalar(V, sqrt(1 / sum));
-    assert(is_vector(N));
-    return N;
+    for(int i = 0; i < n; i++)
+        sum += v[i] * v[i];
+    double norm = sqrt(sum);
+    for(int i = 0; i < n; i++)
+        vn[i] = v[i] / norm;
+    return vn;
 }
-double vector_dot_product(Matrix V1, Matrix V2)
+double vector_dot_product(double* v1, double* v2, int n)
 {
-    assert(is_vector(V1) && is_vector(V2));
     double product = 0;
-    if(V1->r == 1) {
-        assert(V2->c == 1 && V1->c == V2->r);
-        for(int i = 0; i < V1->c; i++)
-            product += V1->A[0][i] * V2->A[i][0];
-    }
-    else {
-        assert(V2->r == 1 && V1->r == V2->c);
-        for(int i = 0; i < V1->r; i++)
-            product += V1->A[i][0] * V2->A[0][i];
-    }
+    for(int i = 0; i < n; i++)
+        product += v1[i] * v2[i];
     return product;
 }
 
@@ -232,26 +205,23 @@ bool matrix_is_orthogonal(Matrix M)
     if(!is_square_matrix(M))
         return false;
     int n = M->c;
-    for(int i = 0; i < n; i++) {
-        double** A1 = calloc(1, sizeof(double*));
-        A1[0] = array_copy(M->A[i], n);
-        Matrix V1 = matrix_new(A1, 1, n);
-        if(!is_normal_vector(V1)) {
-            matrix_free(V1);
+    for(int i = 0; i < n - 1; i++) {
+        double* v1 = array_copy(M->A[i], n);
+        if(!is_normal_vector(v1, n)) {
+            free(v1);
             return false;
-        }
-        for(int j = 0; j < n; i++) {
-            double** A2 = calloc(1, sizeof(double*));
-            A2[0] = array_copy(M->A[i], n);
-            Matrix V2 = matrix_new(A2, 1, n);
-            if(!is_normal_vector(V2) || vector_dot_product(V1, V2) != 1) {
-                matrix_free(V1);
-                matrix_free(V2);
+        }// fabs(vector_dot_product(v1, v2, n) - 1) > DBL_EPSILON
+        for(int j = i + 1; j < n; j++) {
+            double* v2 = array_copy(M->A[j], n);
+            if(!is_normal_vector(v2, n) || 
+                vector_dot_product(v1, v2, n) > DBL_EPSILON) {
+                free(v1);
+                free(v2);
                 return false;
             }
-            matrix_free(V2);
+            free(v2);
         }
-        matrix_free(V1);
+        free(v1);
     }
     return true;
 }
@@ -268,7 +238,59 @@ Matrix matrix_transpose(Matrix M)
     assert(is_matrix(N));
     return N;
 }
-Matrix matrix_lu_decompose(Matrix M);
+void matrix_swap_row(Matrix M, double* b, int r1, int r2)
+{
+    assert(is_matrix(M));
+    if (r1 == r2)
+        return;
+    int c = M->c;
+    for (int i = 0; i < c; i++) {
+        double temp = M->A[r1][i];
+        M->A[r1][i] = M->A[r2][i];
+        M->A[r2][i] = temp;
+    }
+    if(b != NULL) {
+        double temp = b[r1];
+        b[r1] = b[r2];
+        b[r2] = temp;
+    }
+}
+double* matrix_solve_system(Matrix A, double* b, int n)
+{
+    assert(is_square_matrix(A));
+    assert(n == A->c);
+    double* x = calloc(n, sizeof(double));
+    double temp;
+    
+    for (int k = 0; k < n; k++) {
+        int j = k;
+        double max = A->A[j][j];
+ 
+        for (int i = k + 1; i < n; i++)
+            if ((temp = fabs(A->A[i][k])) > max) {
+                j = i;
+                max = temp;
+            }
+                
+        matrix_swap_row(A, b, k, j);
+ 
+        for (int i = k + 1; i < n; i++) {
+            temp = A->A[i][k] / A->A[k][k];
+            for (int j = k + 1; j < n; j++)
+                A->A[i][j] -= temp * A->A[k][j];
+            A->A[i][k] = 0;
+            b[i] -= temp * b[k];
+        }
+    }
+    for (int k = n - 1; k >= 0; k--) {
+        temp = b[k];
+        for (int j = n - 1; j > k; j--)
+            temp -= x[j] * A->A[k][j];
+        x[k] = temp / A->A[k][k];
+    }
+    assert(is_square_matrix(A));
+    return x;
+}
 Matrix matrix_inverse(Matrix M)
 {
     if(!is_square_matrix(M))

@@ -5,6 +5,7 @@
 
 int main()
 {
+    /*
     double** A1 = calloc(2, sizeof(double*));
     A1[0] = calloc(2, sizeof(double));
     A1[1] = calloc(2, sizeof(double));
@@ -58,5 +59,37 @@ int main()
     matrix_free(V2);
     matrix_free(V3);
     matrix_free(V4);
+    */
+
+    double** A1 = calloc(2, sizeof(double*));
+    A1[0] = calloc(2, sizeof(double));
+    A1[1] = calloc(2, sizeof(double));
+    A1[0][0] = 1;
+    A1[0][1] = 2;
+    A1[1][0] = 3;
+    A1[1][1] = 4;
+    Matrix M1 = matrix_new(A1, 2, 2);
+    Matrix M2 = matrix_copy(M1);
+    M2->A[1][0] = M2->A[0][1];
+    M2->A[1][1] = M2->A[0][0];
+    assert(!matrix_is_symmetric(M1));
+    assert(matrix_is_symmetric(M2));
+
+    Matrix M3 = matrix_copy(M2);
+    M3->A[0][1] = 0;
+    M3->A[1][0] = 0;
+    matrix_print(M3);
+    assert(!matrix_is_orthogonal(M2));
+    assert(matrix_is_orthogonal(M3));
+
+    printf("\n");
+    matrix_print(M1);
+    double* b = calloc(2, sizeof(double));
+    b[0] = 1;
+    b[1] = 1;
+    double* x = matrix_solve_system(M1, b, 2);
+    printf("%f\t%f\n", x[0], x[1]);
+    printf("\n");
+    matrix_print(M1);
     return 0;
 }

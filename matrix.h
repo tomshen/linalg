@@ -16,10 +16,9 @@ Matrix matrix_copy(Matrix M);
 void matrix_free(Matrix M);
 void matrix_print(Matrix M);
 
-bool is_vector(Matrix V);
-bool is_normal_vector(Matrix V);
-Matrix vector_normalize(Matrix V);
-double vector_dot_product(Matrix V1, Matrix V2);
+bool is_normal_vector(double* v, int n);
+double* vector_normalize(double* v, int n);
+double vector_dot_product(double* v1, double* v2, int n);
 
 bool matrix_equals(Matrix M1, Matrix M2);
 Matrix matrix_add(Matrix M1, Matrix M2);
@@ -31,6 +30,6 @@ bool matrix_is_symmetric(Matrix M);
 bool matrix_is_orthogonal(Matrix M);
 
 Matrix matrix_transpose(Matrix M); // returns M^t
-Matrix matrix_lu_decompose(Matrix M); // returns L
+double* matrix_solve_system(Matrix A, double* b, int n); // returns solution
 Matrix matrix_inverse(Matrix M); // returns M^-1 or NULL if not possible
 double matrix_determinant(Matrix M); // requires square matrix
