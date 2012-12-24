@@ -6,7 +6,7 @@ Basic linear algebra library written in C
 Planned features
 ----------------
 * ~~Matrices (as 2-dimensional arrays)~~
-* ~~Vectors (as *n* by 1 or 1 by *n* matrices)~~
+* ~~Vectors (as 1-dimensional arrays)~~
     * ~~Normalize~~
     * ~~Dot (inner) product~~
 * ~~Basic operations~~
