@@ -7,33 +7,28 @@ Planned features
 ----------------
 * ~~Matrices (as 2-dimensional arrays)~~
 * ~~Vectors (as n by 1 matrices)~~
-	* ~~Normalize~~
-	* ~~Dot (inner) product~~
+    * ~~Normalize~~
+    * ~~Dot (inner) product~~
 * Basic operations
-	* ~~Addition~~
-	* ~~Subtraction~~
-	* ~~Multiplication~~
-	* ~~Transpose~~
-	* Inversion
-	* Determinant
+    * ~~Addition~~
+    * ~~Subtraction~~
+    * ~~Multiplication~~
 * Basic classification
-	* Symmetric / hermitian
-	* Orthogonal / unitary
-* Complex numbers (make complex number structs?)
+    * Symmetric
+    * Orthogonal
 * Useful operations
-	* Gaussian elimination
-	* L(D)U decomposition
-	* QR decomposition
-	* Least squares regression
-	* Finding basis
-	* SVD decomposition
+    * ~~Transpose~~
+    * Gaussian elimination (LU decomposition)
+    * Inversion (Gauss-Jordan)
+    * Determinant (Use gaussian elimination, take product of diagonal entries)
+    * QR decomposition (and Least squares regression)
 * Eigen-stuff
-	* Finding eigenvalues of matrix
-	* Finding eigenvectors
-	* A = (S)(lamda)(S^-1)
+    * Eigenvalues
+    * Eigenvectors
+    * Eigen Decomposition (if possible)
 * Input
-  * Processing matrices from the command line
-  * Processing matrices from a file
+    * Processing matrices from the command line
+    * Processing matrices from a file
 * Output
-  * ~~Outputting to STDOUT~~
-  * Outputting to a file
+    * ~~Outputting to STDOUT~~
+    * Outputting to a file
