@@ -70,6 +70,7 @@ int main()
     A1[1][1] = 4;
     Matrix M1 = matrix_new(A1, 2, 2);
     Matrix M2 = matrix_copy(M1);
+    Matrix M4 = matrix_copy(M1);
     M2->A[1][0] = M2->A[0][1];
     M2->A[1][1] = M2->A[0][0];
     assert(!matrix_is_symmetric(M1));
@@ -91,5 +92,8 @@ int main()
     printf("%f\t%f\n", x[0], x[1]);
     printf("\n");
     matrix_print(M1);
+
+    matrix_print(M4);
+    printf("%f\n", matrix_determinant(M4));
     return 0;
 }

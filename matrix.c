@@ -82,11 +82,17 @@ void matrix_free(Matrix M)
 void matrix_print(Matrix M)
 {
     assert(is_matrix(M));
+    for(int k = 0; k < M->c; k++)
+        printf("-");
+    printf("\n");
     for(int i = 0; i < M->r; i++) {
         for(int j = 0; j < M->c; j++)
             printf("%.3f\t", M->A[i][j]);
         printf("\n");
     }
+    for(int k = 0; k < M->c; k++)
+        printf("-");
+    printf("\n");
 }
 
 bool is_normal_vector(double* v, int n)
@@ -300,4 +306,42 @@ Matrix matrix_inverse(Matrix M)
     // TODO: fill in actual code here
     return N;
 }
-double matrix_determinant(Matrix M);
+double matrix_determinant(Matrix M)
+{
+    assert(is_square_matrix(M));
+    double temp;
+    double det = 1;
+    int n = M->c;
+
+    if(n == 2) {
+        return M->A[0][0] * M->A[1][1] - M->A[1][0] * M->A[0][1];
+    }
+
+    Matrix A = matrix_copy(M);
+    for (int k = 0; k < n; k++) {
+        int j = k;
+        double max = A->A[j][j];
+ 
+        for (int i = k + 1; i < n; i++)
+            if ((temp = fabs(A->A[i][k])) > max) {
+                j = i;
+                max = temp;
+            }
+                
+        matrix_swap_row(A, NULL, k, j);
+        if(k != j)
+            det *= -1;
+ 
+        for (int i = k + 1; i < n; i++) {
+            temp = A->A[i][k] / A->A[k][k];
+            for (int j = k + 1; j < n; j++)
+                A->A[i][j] -= temp * A->A[k][j];
+            A->A[i][k] = 0;
+        }
+    }
+    assert(is_square_matrix(A));
+    for(int i = 0; i < n; i++)
+        det *= A->A[i][i];
+    free(A);
+    return det;
+}

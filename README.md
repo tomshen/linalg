@@ -20,7 +20,7 @@ Planned features
     * ~~Transpose~~
     * ~~Gaussian elimination~~
     * Inversion (Gauss-Jordan)
-    * Determinant (gaussian elimination, take product of diagonal entries)
+    * ~~Determinant~~
     * QR decomposition (and least squares regression)
 * Input
     * Processing matrices from the command line
