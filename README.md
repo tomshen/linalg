@@ -15,7 +15,7 @@ Planned features
     * ~~Multiplication~~
 * ~~Basic classification~~
     * ~~Symmetric~~
-    * ~~Orthogonal~~ (needs testing)
+    * ~~Orthogonal~~
 * Useful operations
     * ~~Transpose~~
     * ~~Gaussian elimination~~
