@@ -12,6 +12,7 @@ bool is_matrix(Matrix M);
 bool is_square_matrix(Matrix M);
 Matrix matrix_new_empty(int row, int col);
 Matrix matrix_new(double** array, int row, int col);
+Matrix matrix_new_identity(int n);
 Matrix matrix_copy(Matrix M);
 void matrix_free(Matrix M);
 void matrix_print(Matrix M);
@@ -28,8 +29,10 @@ Matrix matrix_multiply_scalar(Matrix M, double n);
 
 bool matrix_is_symmetric(Matrix M);
 bool matrix_is_orthogonal(Matrix M);
+bool matrix_is_identity(Matrix M);
 
 Matrix matrix_transpose(Matrix M); // returns M^t
 double* matrix_solve_system(Matrix A, double* b, int n); // returns solution
-Matrix matrix_inverse(Matrix M); // returns M^-1 or NULL if not possible
+Matrix matrix_cofactor(Matrix M, int i, int j);
 double matrix_determinant(Matrix M); // requires square matrix
+Matrix matrix_inverse(Matrix M); // returns M^-1 or NULL if not possible

@@ -13,7 +13,10 @@ double* array_copy(double* A, int n)
         B[i] = A[i];
     return B;
 }
-
+bool double_equals(double d, int i)
+{
+    return d - i <= DBL_EPSILON;
+}
 bool is_matrix(Matrix M)
 {
     if(M == NULL)
@@ -56,6 +59,14 @@ Matrix matrix_new(double** array, int row, int col)
     assert(is_matrix(M));
     return M;
 }
+Matrix matrix_new_identity(int n)
+{
+    Matrix M = matrix_new_empty(n, n);
+    for(int i = 0; i < n; i++)
+        M->A[i][i] = 1;
+    assert(is_square_matrix(M));
+    return M;
+}
 Matrix matrix_copy(Matrix M)
 {
     assert(is_matrix(M));
@@ -83,15 +94,16 @@ void matrix_print(Matrix M)
 {
     assert(is_matrix(M));
     for(int k = 0; k < M->c; k++)
-        printf("-");
+        printf("------");
     printf("\n");
     for(int i = 0; i < M->r; i++) {
-        for(int j = 0; j < M->c; j++)
-            printf("%.3f\t", M->A[i][j]);
+        for(int j = 0; j < M->c; j++) {
+            printf(" %.3g\t", M->A[i][j]);  
+        }
         printf("\n");
     }
     for(int k = 0; k < M->c; k++)
-        printf("-");
+        printf("------");
     printf("\n");
 }
 
@@ -216,11 +228,11 @@ bool matrix_is_orthogonal(Matrix M)
         if(!is_normal_vector(v1, n)) {
             free(v1);
             return false;
-        }// fabs(vector_dot_product(v1, v2, n) - 1) > DBL_EPSILON
+        }
         for(int j = i + 1; j < n; j++) {
             double* v2 = array_copy(M->A[j], n);
-            if(!is_normal_vector(v2, n) || 
-                vector_dot_product(v1, v2, n) > DBL_EPSILON) {
+            if(!(is_normal_vector(v2, n) && 
+                double_equals(vector_dot_product(v1, v2, n), 0))) {
                 free(v1);
                 free(v2);
                 return false;
@@ -229,6 +241,21 @@ bool matrix_is_orthogonal(Matrix M)
         }
         free(v1);
     }
+    return true;
+}
+bool matrix_is_identity(Matrix M)
+{
+    if(!is_square_matrix(M)) {
+        return false;
+    }
+    int n = M->r;
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++) {
+            if(i == j && !double_equals(M->A[i][j], 1))
+                return false;
+            else if(i != j && !double_equals(M->A[i][j], 0))
+                return false;
+        }
     return true;
 }
 
@@ -297,14 +324,27 @@ double* matrix_solve_system(Matrix A, double* b, int n)
     assert(is_square_matrix(A));
     return x;
 }
-Matrix matrix_inverse(Matrix M)
+Matrix matrix_cofactor(Matrix M, int i, int j)
 {
-    if(!is_square_matrix(M))
-        return NULL;
-    int n = M->r;
-    Matrix N = matrix_new_empty(n, n);
-    // TODO: fill in actual code here
-    return N;
+    assert(is_matrix(M));
+    assert(0 <= i && i < M->r);
+    assert(0 <= j && j < M->c);
+    Matrix C = matrix_new_empty(M->r - 1, M->c - 1);
+    int r = 0;
+    for(int k = 0; k < M->r; k++) {
+        int c = 0;
+        if(k != i) {
+            for(int l = 0; l < M->c; l++) {
+                if(l != j) {
+                    C->A[r][c] = M->A[k][l];
+                    c++;
+                }
+            }
+            r++;
+        }
+    }
+    assert(is_matrix(C));
+    return C;
 }
 double matrix_determinant(Matrix M)
 {
@@ -344,4 +384,27 @@ double matrix_determinant(Matrix M)
         det *= A->A[i][i];
     free(A);
     return det;
+}
+Matrix matrix_inverse(Matrix M)
+{
+    if(!is_square_matrix(M))
+        return NULL;
+    int n = M->r;
+    Matrix N = matrix_new_empty(n, n);
+    double det = matrix_determinant(M);
+    if(double_equals(det, 0))
+        return NULL;
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++) {
+            Matrix C = matrix_cofactor(M, i, j);
+            if((i + j) % 2 == 0)
+                N->A[i][j] = matrix_determinant(C) / det;
+            else
+                N->A[i][j] = -1 * matrix_determinant(C) / det;
+            matrix_free(C);
+        }
+    Matrix I = matrix_transpose(N);
+    matrix_free(N);
+    assert(is_square_matrix(I));
+    return I;
 }

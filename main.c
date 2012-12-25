@@ -61,6 +61,7 @@ int main()
     matrix_free(V4);
     */
 
+    /*
     double** A1 = calloc(2, sizeof(double*));
     A1[0] = calloc(2, sizeof(double));
     A1[1] = calloc(2, sizeof(double));
@@ -95,5 +96,31 @@ int main()
 
     matrix_print(M4);
     printf("%f\n", matrix_determinant(M4));
+    */
+
+    double** A1 = calloc(3, sizeof(double*));
+    A1[0] = calloc(3, sizeof(double));
+    A1[1] = calloc(3, sizeof(double));
+    A1[2] = calloc(3, sizeof(double));
+    A1[0][0] = 1;
+    A1[0][1] = 2;
+    A1[0][2] = 0;
+    A1[1][0] = -1;
+    A1[1][1] = 1;
+    A1[1][2] = 1;
+    A1[2][0] = 1;
+    A1[2][1] = 2;
+    A1[2][2] = 3;
+    Matrix M1 = matrix_new(A1, 3, 3);
+    matrix_print(M1);
+    printf("%f\n", matrix_determinant(M1));
+    Matrix M2 = matrix_inverse(M1);
+    matrix_print(M2);
+
+    Matrix I = matrix_new_identity(3);
+    matrix_print(I);
+    assert(!(matrix_is_identity(M1)));
+    assert(matrix_is_identity(I));
+
     return 0;
 }

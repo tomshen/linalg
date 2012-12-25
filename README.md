@@ -16,11 +16,12 @@ Planned features
 * ~~Basic classification~~
     * ~~Symmetric~~
     * ~~Orthogonal~~
+    * ~~Identity~~
 * Useful operations
     * ~~Transpose~~
     * ~~Gaussian elimination~~
-    * Inversion (Gauss-Jordan)
     * ~~Determinant~~
+    * ~~Inversion~~
     * QR decomposition (and least squares regression)
 * Input
     * Processing matrices from the command line
