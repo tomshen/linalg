@@ -1,11 +1,12 @@
+// Some basic testing for matrix.c
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include "matrix.h"
 
-int main()
+void test1()
 {
-    /*
     double** A1 = calloc(2, sizeof(double*));
     A1[0] = calloc(2, sizeof(double));
     A1[1] = calloc(2, sizeof(double));
@@ -29,39 +30,10 @@ int main()
     matrix_free(M2);
     matrix_free(M3);
     matrix_free(M4);
+}
 
-    double** A3 = calloc(3, sizeof(double*));
-    A3[0] = calloc(1, sizeof(double));
-    A3[1] = calloc(1, sizeof(double));
-    A3[2] = calloc(1, sizeof(double));
-    A3[0][0] = 1;
-    A3[1][0] = 2;
-    A3[2][0] = 3;
-
-    double** A4 = calloc(1, sizeof(double*));
-    A4[0] = calloc(3, sizeof(double));
-    A4[0][0] = 1;
-    A4[0][1] = 2;
-    A4[0][2] = 3;
-
-    Matrix V1 = matrix_new(A3, 3, 1);
-    Matrix V2 = matrix_new(A4, 1, 3);
-    Matrix V3 = vector_normalize(V1);
-
-    printf("\n");
-    printf("%.4f\n", vector_dot_product(V1, V2));
-    printf("\n");
-    matrix_print(V3);
-    Matrix V4 = matrix_transpose(V3);
-    printf("\n");
-    matrix_print(V4);
-    matrix_free(V1);
-    matrix_free(V2);
-    matrix_free(V3);
-    matrix_free(V4);
-    */
-
-    /*
+void test2()
+{
     double** A1 = calloc(2, sizeof(double*));
     A1[0] = calloc(2, sizeof(double));
     A1[1] = calloc(2, sizeof(double));
@@ -74,30 +46,32 @@ int main()
     Matrix M4 = matrix_copy(M1);
     M2->A[1][0] = M2->A[0][1];
     M2->A[1][1] = M2->A[0][0];
-    assert(!matrix_is_symmetric(M1));
-    assert(matrix_is_symmetric(M2));
+    assert(!is_symmetric_matrix(M1));
+    assert(is_symmetric_matrix(M2));
 
     Matrix M3 = matrix_copy(M2);
     M3->A[0][1] = 0;
     M3->A[1][0] = 0;
     matrix_print(M3);
-    assert(!matrix_is_orthogonal(M2));
-    assert(matrix_is_orthogonal(M3));
+    assert(!is_orthogonal_matrix(M2));
+    assert(is_orthogonal_matrix(M3));
 
     printf("\n");
     matrix_print(M1);
     double* b = calloc(2, sizeof(double));
     b[0] = 1;
     b[1] = 1;
-    double* x = matrix_solve_system(M1, b, 2);
+    double* x = solve_system(M1, b, 2);
     printf("%f\t%f\n", x[0], x[1]);
     printf("\n");
     matrix_print(M1);
 
     matrix_print(M4);
     printf("%f\n", matrix_determinant(M4));
-    */
-    /*
+}
+
+void test3()
+{
     double** A1 = calloc(3, sizeof(double*));
     A1[0] = calloc(3, sizeof(double));
     A1[1] = calloc(3, sizeof(double));
@@ -119,10 +93,12 @@ int main()
 
     Matrix I = matrix_new_identity(3);
     matrix_print(I);
-    assert(!(matrix_is_identity(M1)));
-    assert(matrix_is_identity(I));
-    */
-    /*
+    assert(!(is_identity_matrix(M1)));
+    assert(is_identity_matrix(I));
+}
+
+void test4()
+{
     double** A1 = calloc(3, sizeof(double*));
     A1[0] = calloc(3, sizeof(double));
     A1[1] = calloc(3, sizeof(double));
@@ -141,8 +117,10 @@ int main()
     Matrix* QR = matrix_qr_decomposition(M1);
     matrix_print(QR[0]);
     matrix_print(QR[1]);
-    */
+}
 
+void test5()
+{
     double** A1 = calloc(3, sizeof(double*));
     A1[0] = calloc(2, sizeof(double));
     A1[1] = calloc(2, sizeof(double));
@@ -166,5 +144,13 @@ int main()
     double* x = least_squares_regression(A, b);
     for(int i = 0; i < 2; i++)
         printf("%g\n", x[i]);
+}
+int main()
+{
+    test1();
+    test2();
+    test3();
+    test4();
+    test5();
     return 0;
 }

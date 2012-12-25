@@ -4,19 +4,10 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include "util.h"
 #include "matrix.h"
 
-double* array_copy(double* A, int n)
-{
-    double* B = calloc(n, sizeof(double));
-    for(int i = 0; i < n; i++)
-        B[i] = A[i];
-    return B;
-}
-bool double_equals(double d, int i)
-{
-    return d - i <= DBL_EPSILON;
-}
+
 bool is_matrix(Matrix M)
 {
     if(M == NULL)
@@ -34,20 +25,59 @@ bool is_square_matrix(Matrix M)
 {
     return is_matrix(M) && M->r == M->c;
 }
-Matrix matrix_new_empty(int row, int col)
+bool is_symmetric_matrix(Matrix M)
 {
-    assert(row > 0 && col > 0);
-    Matrix M = malloc(sizeof(matrix));
-    M->r = row;
-    M->c = col;
-    double** A = calloc(row, sizeof(double*));
-    for(int i = 0; i < row; i++) {
-        A[i] = calloc(col, sizeof(double));
-    }
-    M->A = A;
-    assert(is_matrix(M));
-    return M;
+    if(!is_square_matrix(M))
+        return false;
+    int n = M->r;
+    for(int i = 0; i < n; i++)
+        for(int j = i; j < n; j++)
+            if(M->A[i][j] != M->A[j][i])
+                return false;
+    return true;
 }
+bool is_orthogonal_matrix(Matrix M)
+{
+    if(!is_square_matrix(M))
+        return false;
+    int n = M->c;
+    for(int i = 0; i < n - 1; i++) {
+        double* v1 = array_copy(M->A[i], n);
+        if(!is_normal_vector(v1, n)) {
+            free(v1);
+            return false;
+        }
+        for(int j = i + 1; j < n; j++) {
+            double* v2 = array_copy(M->A[j], n);
+            if(!(is_normal_vector(v2, n) && 
+                double_equals(vector_dot_product(v1, v2, n), 0))) {
+                free(v1);
+                free(v2);
+                return false;
+            }
+            free(v2);
+        }
+        free(v1);
+    }
+    return true;
+}
+bool is_identity_matrix(Matrix M)
+{
+    if(!is_square_matrix(M)) {
+        return false;
+    }
+    int n = M->r;
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++) {
+            if(i == j && !double_equals(M->A[i][j], 1))
+                return false;
+            else if(i != j && !double_equals(M->A[i][j], 0))
+                return false;
+        }
+    return true;
+}
+
+
 Matrix matrix_new(double** array, int row, int col)
 {
     assert(row > 0 && col > 0);
@@ -59,8 +89,22 @@ Matrix matrix_new(double** array, int row, int col)
     assert(is_matrix(M));
     return M;
 }
+Matrix matrix_new_empty(int row, int col)
+{
+    assert(row > 0 && col > 0);
+    Matrix M = malloc(sizeof(matrix));
+    M->r = row;
+    M->c = col;
+    double** A = calloc(row, sizeof(double*));
+    for(int i = 0; i < row; i++)
+        A[i] = calloc(col, sizeof(double));
+    M->A = A;
+    assert(is_matrix(M));
+    return M;
+}
 Matrix matrix_new_identity(int n)
 {
+    assert(n > 0);
     Matrix M = matrix_new_empty(n, n);
     for(int i = 0; i < n; i++)
         M->A[i][i] = 1;
@@ -82,6 +126,8 @@ Matrix matrix_copy(Matrix M)
     assert(is_matrix(C));
     return C;
 }
+
+
 void matrix_free(Matrix M)
 {
     assert(is_matrix(M));
@@ -106,6 +152,7 @@ void matrix_print(Matrix M)
         printf("------");
     printf("\n");
 }
+
 
 bool is_normal_vector(double* v, int n)
 {
@@ -141,6 +188,7 @@ double* vector_projection(double* e, double* a, int n)
         p[i] = ea * e[i] / ee;
     return p;
 }
+
 
 bool matrix_equals(Matrix M1, Matrix M2)
 {
@@ -213,57 +261,6 @@ Matrix matrix_multiply_scalar(Matrix M, double n)
     return N;
 }
 
-bool matrix_is_symmetric(Matrix M)
-{
-    if(!is_square_matrix(M))
-        return false;
-    int n = M->r;
-    for(int i = 0; i < n; i++)
-        for(int j = i; j < n; j++)
-            if(M->A[i][j] != M->A[j][i])
-                return false;
-    return true;
-}
-bool matrix_is_orthogonal(Matrix M)
-{
-    if(!is_square_matrix(M))
-        return false;
-    int n = M->c;
-    for(int i = 0; i < n - 1; i++) {
-        double* v1 = array_copy(M->A[i], n);
-        if(!is_normal_vector(v1, n)) {
-            free(v1);
-            return false;
-        }
-        for(int j = i + 1; j < n; j++) {
-            double* v2 = array_copy(M->A[j], n);
-            if(!(is_normal_vector(v2, n) && 
-                double_equals(vector_dot_product(v1, v2, n), 0))) {
-                free(v1);
-                free(v2);
-                return false;
-            }
-            free(v2);
-        }
-        free(v1);
-    }
-    return true;
-}
-bool matrix_is_identity(Matrix M)
-{
-    if(!is_square_matrix(M)) {
-        return false;
-    }
-    int n = M->r;
-    for(int i = 0; i < n; i++)
-        for(int j = 0; j < n; j++) {
-            if(i == j && !double_equals(M->A[i][j], 1))
-                return false;
-            else if(i != j && !double_equals(M->A[i][j], 0))
-                return false;
-        }
-    return true;
-}
 
 Matrix matrix_transpose(Matrix M)
 {
@@ -293,42 +290,6 @@ void matrix_swap_row(Matrix M, double* b, int r1, int r2)
         b[r1] = b[r2];
         b[r2] = temp;
     }
-}
-double* matrix_solve_system(Matrix A, double* b, int n)
-{
-    assert(is_square_matrix(A));
-    assert(n == A->r);
-    double* x = calloc(n, sizeof(double));
-    double temp;
-    
-    for (int k = 0; k < n; k++) {
-        int j = k;
-        double max = A->A[j][j];
- 
-        for (int i = k + 1; i < n; i++)
-            if ((temp = fabs(A->A[i][k])) > max) {
-                j = i;
-                max = temp;
-            }
-                
-        matrix_swap_row(A, b, k, j);
- 
-        for (int i = k + 1; i < n; i++) {
-            temp = A->A[i][k] / A->A[k][k];
-            for (int j = k + 1; j < n; j++)
-                A->A[i][j] -= temp * A->A[k][j];
-            A->A[i][k] = 0;
-            b[i] -= temp * b[k];
-        }
-    }
-    for (int k = n - 1; k >= 0; k--) {
-        temp = b[k];
-        for (int j = n - 1; j > k; j--)
-            temp -= x[j] * A->A[k][j];
-        x[k] = temp / A->A[k][k];
-    }
-    assert(is_square_matrix(A));
-    return x;
 }
 Matrix matrix_cofactor(Matrix M, int i, int j)
 {
@@ -456,6 +417,43 @@ Matrix* matrix_qr_decomposition(Matrix M)
     return QR;
 }
 
+
+double* solve_system(Matrix A, double* b, int n)
+{
+    assert(is_square_matrix(A));
+    assert(n == A->r);
+    double* x = calloc(n, sizeof(double));
+    double temp;
+    
+    for (int k = 0; k < n; k++) {
+        int j = k;
+        double max = A->A[j][j];
+ 
+        for (int i = k + 1; i < n; i++)
+            if ((temp = fabs(A->A[i][k])) > max) {
+                j = i;
+                max = temp;
+            }
+                
+        matrix_swap_row(A, b, k, j);
+ 
+        for (int i = k + 1; i < n; i++) {
+            temp = A->A[i][k] / A->A[k][k];
+            for (int j = k + 1; j < n; j++)
+                A->A[i][j] -= temp * A->A[k][j];
+            A->A[i][k] = 0;
+            b[i] -= temp * b[k];
+        }
+    }
+    for (int k = n - 1; k >= 0; k--) {
+        temp = b[k];
+        for (int j = n - 1; j > k; j--)
+            temp -= x[j] * A->A[k][j];
+        x[k] = temp / A->A[k][k];
+    }
+    assert(is_square_matrix(A));
+    return x;
+}
 double* least_squares_regression(Matrix A, double* b)
 {
     Matrix* QR = matrix_qr_decomposition(A);
@@ -466,7 +464,7 @@ double* least_squares_regression(Matrix A, double* b)
             d[i] += Qt->A[i][j] * b[j];
     free(Qt);
     matrix_print(QR[1]);
-    double* x = matrix_solve_system(QR[1], d, Qt->r);
+    double* x = solve_system(QR[1], d, Qt->r);
     matrix_free(QR[1]);
     free(d);
     free(QR);
