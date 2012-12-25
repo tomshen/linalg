@@ -17,12 +17,13 @@ Planned features
     * ~~Symmetric~~
     * ~~Orthogonal~~
     * ~~Identity~~
-* Useful operations
+* ~~Useful operations~~
     * ~~Transpose~~
     * ~~Gaussian elimination~~
     * ~~Determinant~~
     * ~~Inversion~~
-    * QR decomposition (and least squares regression)
+    * ~~QR decomposition~~
+    * ~~Least squares regression~~
 * Input
     * Processing matrices from the command line
     * Processing matrices from a file

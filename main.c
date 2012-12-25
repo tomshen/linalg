@@ -97,7 +97,7 @@ int main()
     matrix_print(M4);
     printf("%f\n", matrix_determinant(M4));
     */
-
+    /*
     double** A1 = calloc(3, sizeof(double*));
     A1[0] = calloc(3, sizeof(double));
     A1[1] = calloc(3, sizeof(double));
@@ -121,6 +121,50 @@ int main()
     matrix_print(I);
     assert(!(matrix_is_identity(M1)));
     assert(matrix_is_identity(I));
+    */
+    /*
+    double** A1 = calloc(3, sizeof(double*));
+    A1[0] = calloc(3, sizeof(double));
+    A1[1] = calloc(3, sizeof(double));
+    A1[2] = calloc(3, sizeof(double));
+    A1[0][0] = 12;
+    A1[0][1] = -51;
+    A1[0][2] = 4;
+    A1[1][0] = 6;
+    A1[1][1] = 167;
+    A1[1][2] = -68;
+    A1[2][0] = -4;
+    A1[2][1] = 24;
+    A1[2][2] = -41;
+    Matrix M1 = matrix_new(A1, 3, 3);
+    matrix_print(M1);
+    Matrix* QR = matrix_qr_decomposition(M1);
+    matrix_print(QR[0]);
+    matrix_print(QR[1]);
+    */
 
+    double** A1 = calloc(3, sizeof(double*));
+    A1[0] = calloc(2, sizeof(double));
+    A1[1] = calloc(2, sizeof(double));
+    A1[2] = calloc(2, sizeof(double));
+    A1[0][0] = 3;
+    A1[0][1] = -6;
+    A1[1][0] = 4;
+    A1[1][1] = -8;
+    A1[2][0] = 0;
+    A1[2][1] = 1;
+    Matrix A = matrix_new(A1, 3, 2);
+    matrix_print(A);
+    Matrix* QR = matrix_qr_decomposition(A);
+    matrix_print(QR[0]);
+    matrix_print(QR[1]);
+    
+    double* b = calloc(3, sizeof(double));
+    b[0] = -1;
+    b[1] = 7;
+    b[2] = 2;
+    double* x = least_squares_regression(A, b);
+    for(int i = 0; i < 2; i++)
+        printf("%g\n", x[i]);
     return 0;
 }

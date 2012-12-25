@@ -132,6 +132,15 @@ double vector_dot_product(double* v1, double* v2, int n)
         product += v1[i] * v2[i];
     return product;
 }
+double* vector_projection(double* e, double* a, int n)
+{
+    double ea = vector_dot_product(e, a, n);
+    double ee = vector_dot_product(e, e, n);
+    double* p = calloc(n, sizeof(double));
+    for(int i = 0; i < n; i++)
+        p[i] = ea * e[i] / ee;
+    return p;
+}
 
 bool matrix_equals(Matrix M1, Matrix M2)
 {
@@ -183,12 +192,9 @@ Matrix matrix_multiply(Matrix M1, Matrix M2)
     int m = M1->c;
     Matrix M = matrix_new_empty(r, c);
     for(int i = 0; i < r; i++)
-        for(int j = 0; j < c; j++) {
-            for(int k = 0; k < m; k++) {
-                assert((FLT_MAX - M->A[i][j]) / M1->A[i][k] >= M2->A[k][j]);
+        for(int j = 0; j < c; j++)
+            for(int k = 0; k < m; k++)
                 M->A[i][j] += M1->A[i][k] * M2->A[k][j];
-            }
-        }
     assert(is_matrix(M));
     return M;
 }
@@ -291,7 +297,7 @@ void matrix_swap_row(Matrix M, double* b, int r1, int r2)
 double* matrix_solve_system(Matrix A, double* b, int n)
 {
     assert(is_square_matrix(A));
-    assert(n == A->c);
+    assert(n == A->r);
     double* x = calloc(n, sizeof(double));
     double temp;
     
@@ -407,4 +413,62 @@ Matrix matrix_inverse(Matrix M)
     matrix_free(N);
     assert(is_square_matrix(I));
     return I;
+}
+double* matrix_column_vector(Matrix M, int c)
+{
+    assert(is_matrix(M));
+    double* v = calloc(M->r, sizeof(double));
+    for(int i = 0; i < M->r; i++)
+        v[i] = M->A[i][c];
+    return v;
+}
+Matrix* matrix_qr_decomposition(Matrix M)
+{
+    assert(is_matrix(M));
+    int m = M->r;
+    int n = M->c;
+    Matrix Q = matrix_new_empty(m, n);
+    for(int i = 0; i < n; i++) {
+        double* u = matrix_column_vector(M, i);
+        double* a = matrix_column_vector(M, i);
+        for(int k = 0; k < i; k++) {
+            double* e = matrix_column_vector(Q, k);
+            double* p = vector_projection(e, a, m);
+            free(e);
+            for(int j = 0; j < m; j++)
+                u[j] -= p[j];
+            free(p);
+        }
+        free(a);
+        double* e = vector_normalize(u, m);
+        free(u);
+        for(int l = 0; l < m; l++)
+            Q->A[l][i] = e[l];
+        free(e);
+    }
+    Matrix Qt = matrix_transpose(Q);
+    Matrix R = matrix_multiply(Qt, M);
+    matrix_free(Qt);
+
+    Matrix* QR = calloc(2, sizeof(Matrix));
+    QR[0] = Q;
+    QR[1] = R;
+    return QR;
+}
+
+double* least_squares_regression(Matrix A, double* b)
+{
+    Matrix* QR = matrix_qr_decomposition(A);
+    Matrix Qt = matrix_transpose(QR[0]);
+    double* d = calloc(Qt->r, sizeof(double));
+    for(int i = 0; i < Qt->r; i++)
+        for(int j = 0; j < Qt->c; j++)
+            d[i] += Qt->A[i][j] * b[j];
+    free(Qt);
+    matrix_print(QR[1]);
+    double* x = matrix_solve_system(QR[1], d, Qt->r);
+    matrix_free(QR[1]);
+    free(d);
+    free(QR);
+    return x;
 }

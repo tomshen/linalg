@@ -20,6 +20,7 @@ void matrix_print(Matrix M);
 bool is_normal_vector(double* v, int n);
 double* vector_normalize(double* v, int n);
 double vector_dot_product(double* v1, double* v2, int n);
+double* vector_projection(double* v1, double* v2, int n);
 
 bool matrix_equals(Matrix M1, Matrix M2);
 Matrix matrix_add(Matrix M1, Matrix M2);
@@ -32,7 +33,10 @@ bool matrix_is_orthogonal(Matrix M);
 bool matrix_is_identity(Matrix M);
 
 Matrix matrix_transpose(Matrix M); // returns M^t
-double* matrix_solve_system(Matrix A, double* b, int n); // returns solution
+double* matrix_solve_system(Matrix A, double* b, int n); // returns solution, A becomes triangular
 Matrix matrix_cofactor(Matrix M, int i, int j);
 double matrix_determinant(Matrix M); // requires square matrix
 Matrix matrix_inverse(Matrix M); // returns M^-1 or NULL if not possible
+Matrix* matrix_qr_decomposition(Matrix M); // returns array of two matrices: Q, R
+
+double* least_squares_regression(Matrix A, double* b);
