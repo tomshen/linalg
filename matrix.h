@@ -28,12 +28,12 @@ Matrix matrix_new_identity(int n);
 Matrix matrix_copy(Matrix M);
 
 
-// Meta operations
+// Utils
 void matrix_free(Matrix M);
 void matrix_print(Matrix M);
-// n is the number of decimal places to print the numbers to
-void matrix_print_format(Matrix M, int n);
-
+void matrix_print_format(Matrix M, int n); // prints to n decimal places
+void matrix_swap_row(Matrix M, double* b, int r1, int r2);
+double* matrix_column_vector(Matrix M, int c); // get column c of matrix M
 
 // Vectors - common vector operations
 bool is_normal_vector(double* v, int n);
@@ -42,15 +42,12 @@ double vector_dot_product(double* v1, double* v2, int n);
 double* vector_projection(double* v1, double* v2, int n);
 
 
-// Arithmetic - basic operations with matrices
+// Basic operations with matrices
 bool matrix_equals(Matrix M1, Matrix M2);
 Matrix matrix_add(Matrix M1, Matrix M2);
 Matrix matrix_subtract(Matrix M1, Matrix M2);
 Matrix matrix_multiply(Matrix M1, Matrix M2);
 Matrix matrix_multiply_scalar(Matrix M, double n);
-
-
-// Useful operations - more complicated, common operations with matrices
 
 // returns the transpose of M
 Matrix matrix_transpose(Matrix M);
