@@ -31,6 +31,8 @@ Matrix matrix_copy(Matrix M);
 // Meta operations
 void matrix_free(Matrix M);
 void matrix_print(Matrix M);
+// n is the number of decimal places to print the numbers to
+void matrix_print_format(Matrix M, int n);
 
 
 // Vectors - common vector operations

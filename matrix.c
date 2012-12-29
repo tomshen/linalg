@@ -4,6 +4,7 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include <limits.h>
 #include "util.h"
 #include "matrix.h"
 
@@ -138,18 +139,33 @@ void matrix_free(Matrix M)
 }
 void matrix_print(Matrix M)
 {
+    matrix_print_format(M, 3);
+}
+void matrix_print_format(Matrix M, int n)
+{
     assert(is_matrix(M));
     for(int k = 0; k < M->c; k++)
-        printf("------");
+        printf("--------");
     printf("\n");
+
+    // ensures you don't print something like -0.000
+    int c = 1;
+    for(int i = 0; i < n; i++) {
+        assert(INT_MAX / 10 >= c);
+        c *= 10;
+    }
+
     for(int i = 0; i < M->r; i++) {
         for(int j = 0; j < M->c; j++) {
-            printf(" %.3g\t", M->A[i][j]);  
+            if((int)(M->A[i][j] * c) == (int)(M->A[i][j]) * c)
+                printf(" %-d\t", (int)M->A[i][j]);
+            else
+                printf(" %-.*f\t", n, M->A[i][j]);  
         }
         printf("\n");
     }
     for(int k = 0; k < M->c; k++)
-        printf("------");
+        printf("--------");
     printf("\n");
 }
 
